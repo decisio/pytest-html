@@ -452,12 +452,16 @@ class HTMLReport(object):
 
         doc = html.html(head, body)
 
+        session.config.hook.pytest_html_results_document(doc=doc)
+
         unicode_doc = u'<!DOCTYPE html>\n{0}'.format(doc.unicode(indent=2))
         if PY3:
             # Fix encoding issues, e.g. with surrogates
             unicode_doc = unicode_doc.encode('utf-8',
                                              errors='xmlcharrefreplace')
             unicode_doc = unicode_doc.decode('utf-8')
+
+
         return unicode_doc
 
     def _generate_environment(self, config):
