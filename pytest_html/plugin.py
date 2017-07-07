@@ -169,6 +169,10 @@ class HTMLReport(object):
             href = None
             if extra.get('format') == extras.FORMAT_IMAGE:
                 content = extra.get('content')
+                extra_kwargs = {}
+                name = extra.get('name', None)
+                if name:
+                    extra_kwargs = {'title': name}
                 try:
                     is_uri_or_path = (content.startswith(('file', 'http')) or
                                       isfile(content))
@@ -181,12 +185,12 @@ class HTMLReport(object):
                         warnings.warn('Self-contained HTML report '
                                       'includes link to external '
                                       'resource: {}'.format(content))
-                    html_div = html.a(html.img(src=content), href=content)
+                    html_div = html.a(html.img(src=content, **extra_kwargs), href=content)
                 elif self.self_contained:
                     src = 'data:{0};base64,{1}'.format(
                         extra.get('mime_type'),
                         content)
-                    html_div = html.img(src=src)
+                    html_div = html.img(src=src, **extra_kwargs)
                 else:
                     if PY3:
                         content = b64decode(content.encode('utf-8'))
@@ -195,7 +199,7 @@ class HTMLReport(object):
                     href = src = self.create_asset(
                         content, extra_index, test_index,
                         extra.get('extension'), 'wb')
-                    html_div = html.a(html.img(src=src), href=href)
+                    html_div = html.a(html.img(src=src, **extra_kwargs), href=href)
                 self.additional_html.append(html.div(html_div, class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
