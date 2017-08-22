@@ -199,7 +199,12 @@ class HTMLReport(object):
                     href = src = self.create_asset(
                         content, extra_index, test_index,
                         extra.get('extension'), 'wb')
-                    html_div = html.a(html.img(src=src, **extra_kwargs), href=href)
+                    if extra.get('lazy', False):
+                        extra_attrs = [' {}="{}"'.format(key, value) for key, value in extra_kwargs.items()]
+                        img = raw('<img class="lazy" data-original="{}"{} />'.format(src, "".join(extra_attrs)))
+                    else:
+                        img = html.img(src=src, **extra_kwargs)
+                    html_div = html.a(img, href=href, target="_new")
                 self.additional_html.append(html.div(html_div, class_='image'))
 
             elif extra.get('format') == extras.FORMAT_HTML:
